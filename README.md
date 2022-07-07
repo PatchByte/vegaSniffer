@@ -30,3 +30,9 @@ And happy sniffing now just wait until the network does arp requests!
 ## What next?
 - ARP exploits...
 - Code Cleanup
+
+## Projects I stole code from
+https://github.com/jeremycw/httpserver.h -> http server tiny c code!
+https://codepen.io/alvarotrigo/pen/YzEdrKj -> toggles for css (for the next things..)
+https://github.com/DaveGamble/cJSON -> json parser / writer!
+https://stackoverflow.com/a/426485 -> base64 decoder!
