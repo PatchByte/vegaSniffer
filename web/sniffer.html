@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Vega Jammer UI</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="stylesheet" href="/toggle.css">
+    <style>
+        *
+        {
+            color: white;
+        }
+
+        body
+        {
+            padding-top: 0px;
+            margin-top: 0px;
+            background-color: #2f3640;
+        }
+
+        .ip-list
+        {
+            width: 100%;
+            height: 100%;
+        }
+
+        .ip-entry
+        {
+            background-color: #2a2f35;
+            width: 95%;
+            /*height: 14%;*/
+            left: 50%;
+            position: relative;
+            transform: translate(-50%, 0%);
+            padding: 0 0;
+            margin: 0 0;
+            border-style: solid;
+            border-color: #292323;
+            border-width: 2px;
+            border-radius: 5px;
+            margin-top: 2.5%;
+            padding-top: 5%;
+            padding-bottom: 5%;
+        }
+
+        #ip-title
+        {
+            margin-top: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="childs">
+        <!--<div class="ip-entry">
+            <center>
+                <h2 id="ip-title">192.168.178.48</h2>
+                <label class="toggle">
+                    <input class="toggle-checkbox" type="checkbox" checked>
+                    <div class="toggle-switch"></div>
+                </label>
+            </center>
+        </div>-->
+    </div>
+    
+    <script>
+
+        function createIpEntry(ipAddr, ipObj) {
+            var container = document.createElement("div");
+            var cnter = document.createElement("center");
+            container.appendChild(cnter);
+
+            container.className = "ip-entry";
+            container.id = `ip-entry-${ipAddr}`
+
+            var ipTitle = document.createElement("h2")
+            ipTitle.id = "ip-title";
+            ipTitle.innerText = ipAddr;
+
+            var nameTitle = document.createElement("h4")
+            nameTitle.id = "ip-title";
+            nameTitle.innerText = ipObj.hostname;
+            
+            cnter.appendChild(ipTitle);
+            cnter.appendChild(nameTitle)
+
+            document.querySelector(".childs").appendChild(container)
+        }
+
+        function reloadConfig(params) {
+            fetch("/api/config").then(response => response.json()).then((data) => {
+
+                if(data == {})
+                {
+                    return;
+                }
+
+                if(window.vegaJammer.sessionId != data.sessionId)
+                {
+                    document.querySelector(".childs").innerHTML = ""
+                }
+
+                window.vegaJammer.sessionId = data.sessionId
+                
+                for (const [key, value] of Object.entries(data.nodes)) {
+                    if(window.vegaJammer.ipsCached[key] == undefined)
+                    {
+                        createIpEntry(key, value)
+                    }
+                }
+
+                window.vegaJammer.ipsCached = data.nodes
+            })
+        }
+
+        ((() => {
+            window.vegaJammer = {
+                ipsCached: {
+
+                },
+                overrideConfig: false,
+                sessionId: 0
+            }
+
+            setInterval(() => {
+                if(window.vegaJammer.overrideConfig == false)
+                {
+                    reloadConfig()
+                }
+            }, 500)
+        })())
+    </script>
+</body>
+</html>
