@@ -11,7 +11,7 @@ Just a project for fun! Made for rooted android phones!
 
 ```sh
 Follow: https://developer.android.com/ndk/guides/other_build_systems
-
+python gencache.py
 make
 adb push bin/arpui /data/local/tmp
 adb shell
