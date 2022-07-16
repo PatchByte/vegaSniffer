@@ -5,7 +5,7 @@ Just a project for fun! Made for rooted android phones!
 ## Setup
 - Android NDK (Min: Api Version: 24)
 - make
-- bash (git bash on windows with cmake)
+- bash (git bash on windows with make)
 
 ## Build
 
