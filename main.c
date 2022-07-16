@@ -1,6 +1,7 @@
-#include <stdio.h>
- #include <byteswap.h>
+#include "commonIncludes.h"
 #include "netIncludes.h"
+
+#include "str2int.h"
 
 #define HTTPSERVER_IMPL
 #include "httplib.h"
@@ -10,6 +11,7 @@
 
 #include "vegaConfig.h"
 #include "vegaSniffer.h"
+#include "vegaTests.h"
 
 #include "cJSON.h"
 
@@ -30,6 +32,31 @@ void handle_request(struct http_request_s* request) {
   struct http_response_s* response = http_response_init();
   http_response_status(response, 200);
   
+  if(g_VegaConfig->NeedApiAuth(g_VegaConfig) == 1)
+  {
+    printf("%s\n", g_VegaConfig->apiKey);
+    http_string_t apiKeyHeader = http_request_header(request, "vegaApiKey");
+
+    if(apiKeyHeader.buf != 0 && apiKeyHeader.len > 0)
+    {
+      if(memcmp(apiKeyHeader.buf, g_VegaConfig->apiKey, strlen(g_VegaConfig->apiKey)) == 0)
+      {
+
+      }
+      else
+      {
+        http_response_status(response, 451);
+        http_respond(request, response);
+        return;
+      }
+    }
+    else
+    {
+      http_response_status(response, 451);
+      http_respond(request, response);
+      return;
+    }
+  }
   
   http_string_t trg = http_request_target(request);
   const char* reqUrl = trg.buf;
@@ -38,6 +65,11 @@ void handle_request(struct http_request_s* request) {
   memcpy((void*)fmtUrl, (void*)reqUrl, trg.len);
   
   struct PackFile* targetFile = g_VegaCache->getFile(g_VegaCache, fmtUrl);
+
+  if(g_VegaConfig->needsWebInterface != 1)
+  {
+    targetFile = NULL;
+  }
 
   if(targetFile)
   {
@@ -165,16 +197,62 @@ void* thread_sniffer(void* p)
 }
 
 
-int main() {
-  
-  g_VegaCache = createVegaCache();
-  g_VegaCache->registerFiles(g_VegaCache);
+int main(int argc, char *argv[]) {
   g_VegaConfig = createVegaConfig();
-  g_VegaSniffer = CreateVegaSniffer();
-  g_VegaSniffer->vegaConfig = g_VegaConfig;
 
-  pthread_create(&snifferThread, NULL, thread_sniffer, NULL);
-  
-  struct http_server_s* server = http_server_init(8090, handle_request);
-  http_server_listen(server);
+  {
+    // arg parsing
+    size_t optind;
+    for (optind = 1; optind < argc && argv[optind][0] == '-'; optind++) {
+        switch (argv[optind][1]) {
+        case 'h':
+        {
+          printf("Help:\n");
+          printf("-h : Display's this\n");
+          printf("-k : Set the Api Key\n");
+          printf("-w : Start a Web Interface\n");
+          printf("-t : Testing Mode!\n");
+          exit(EXIT_SUCCESS);
+          break;
+        }
+        case 'k':
+        {
+          g_VegaConfig->SetApiKey(g_VegaConfig, argv[optind+1]);
+          optind = optind + 1;
+          break;
+        }
+        case 'w':
+        {
+          g_VegaConfig->needsWebInterface = 1;
+          break;
+        }
+        case 't':
+        {
+          g_VegaConfig->needsTesting = 1;
+          break;
+        }
+        default:
+            fprintf(stderr, "Usage: %s [-hkwt]\n", argv[0]);
+            exit(EXIT_FAILURE);
+        }   
+    }
+  }
+  if(g_VegaConfig->needsTesting == 1) {
+    printf("[vega::status] Running in testing mode!\n");
+    runTests();
+    exit(EXIT_SUCCESS);
+  }
+  {
+    g_VegaCache = createVegaCache();
+    g_VegaCache->registerFiles(g_VegaCache);
+    g_VegaSniffer = CreateVegaSniffer();
+    g_VegaSniffer->vegaConfig = g_VegaConfig;
+
+    pthread_create(&snifferThread, NULL, thread_sniffer, NULL);
+    
+    printf("[vega::status] Running on port 0.0.0.0:%i\n", g_VegaConfig->webInterfacePort);
+
+    struct http_server_s* server = http_server_init(g_VegaConfig->webInterfacePort, handle_request);
+    http_server_listen(server);
+  }
 }

@@ -3,12 +3,11 @@
 
 #include <stdio.h>
 #include <arpa/inet.h>
-
 #include <byteswap.h>
-
 #include <errno.h>
-
 #include <math.h>
+
+#include <string.h>
 
 void vegaConfigError(const char* reason)
 {
@@ -85,6 +84,27 @@ void VegaConfig__SetNodeState(struct VegaConfig* cfg, unsigned int ip, int state
     free(fmtIp);
 }
 
+int VegaConfig__NeedApiAuth(struct VegaConfig* cfg)
+{
+    return cfg->apiKey != NULL;
+}
+
+void VegaConfig__SetApiKey(struct VegaConfig* cfg, char* key)
+{
+    if(cfg->apiKey != 0)
+    {
+        free(cfg->apiKey);
+    }
+
+    if(key == 0)
+    {
+        cfg->apiKey = NULL;
+        return;
+    }
+
+    cfg->apiKey = strdup(key);
+}
+
 struct VegaConfig* createVegaConfig()
 {
     struct VegaConfig* cfg = malloc(sizeof(struct VegaConfig));
@@ -100,11 +120,20 @@ struct VegaConfig* createVegaConfig()
     cfg->IpToNode       = VegaNode__FromString;
     cfg->SetNodeState   = VegaConfig__SetNodeState;
 
+    cfg->NeedApiAuth    = VegaConfig__NeedApiAuth;
+    cfg->SetApiKey      = VegaConfig__SetApiKey;
+
     cfg->jsonConfig = cJSON_CreateObject();
 
     srand(time(NULL));
 
     cfg->sessionId = (int) rand();
+    cfg->apiKey = NULL;
+
+    cfg->needsWebInterface = 0;
+    cfg->webInterfacePort = 8090;
+
+    cfg->needsTesting = 0;
 
     printf("[vega::sessionId] %04x\n", cfg->sessionId);
 
