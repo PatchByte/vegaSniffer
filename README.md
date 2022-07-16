@@ -18,7 +18,8 @@ adb shell
 su # rooted android required
 cd /data/local/tmp
 chmod +x arpui
-./arpui
+./arpui -w
+# -w -> webinterface!
 ```
 
 ```
