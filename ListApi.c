@@ -35,8 +35,9 @@ struct vegaNode* getLastVegaNodeInList(struct vegaNode* nodeInList)
 
     do
     {
+        if(cNode->next == NULL) break;
         cNode = cNode->next;
-    } while (cNode->next != NULL);
+    } while (cNode != NULL);
 
     return cNode;
 }
@@ -47,8 +48,9 @@ struct vegaNode* getFirstVegaNodeInList(struct vegaNode* nodeInList)
 
     do
     {
+        if(cNode->prev == NULL) break;
         cNode = cNode->prev;
-    } while (cNode->prev != NULL);
+    } while (cNode != NULL);
 
     return cNode;
 }

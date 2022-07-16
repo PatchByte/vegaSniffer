@@ -3,7 +3,7 @@
 
 struct VegaJammer
 {
-    
+    struct vegaNode* threadList;
 };
 
 struct VegaJammer* createVegaJammer();
