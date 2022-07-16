@@ -22,4 +22,6 @@ struct vegaNode*    appendVegaNode(struct vegaNode* nodeInList);
 
 struct vegaNode*    findVegaNodeWithKey(struct vegaNode* nodeInList, vegaKey key);
 
+int getCountOfVegaNodes(struct vegaNode* nd);
+
 #endif

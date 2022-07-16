@@ -1049,3 +1049,4 @@ build.sh
 
 .vscode
 upload.bat
+release_all/

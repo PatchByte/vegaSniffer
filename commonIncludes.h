@@ -1,3 +1,5 @@
+#pragma warnings(off)
+
 #ifndef _COMMONINCLUDES_H
 #define _COMMONINCLUDES_H
 

@@ -23,11 +23,14 @@ void runTests()
 
     do
     {
-        printf("%i\n", cNode->value);
+        printf("%p:%04x:%04x\n", cNode, cNode->key, cNode->value);
 
         cNode = cNode->next;
     } while (cNode != NULL);
     
     printf("FK: FIRST: %p, LAST: %p\n", getFirstVegaNodeInList(next2), getLastVegaNodeInList(beginNode));
     printf("RL: FIRST: %p, LAST: %p\n", beginNode, next2);
+    printf("CT: %i\n", getCountOfVegaNodes(getFirstVegaNodeInList(next1)));
+
+    freeVegaNodeList(next2);
 }

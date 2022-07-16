@@ -1,8 +1,6 @@
 #include "commonIncludes.h"
 #include "netIncludes.h"
 
-#include "str2int.h"
-
 #define HTTPSERVER_IMPL
 #include "httplib.h"
 

@@ -22,11 +22,13 @@ void freeVegaNodeList(struct vegaNode* list)
     do
     {
         struct vegaNode* cachedPtr = cNode->prev;
+
+        if(cachedPtr == NULL) break;
         
         free(cNode);
 
         cNode = cachedPtr;
-    } while (cNode->prev != NULL);
+    } while (cNode != NULL);
 }
 
 struct vegaNode* getLastVegaNodeInList(struct vegaNode* nodeInList)
@@ -79,7 +81,22 @@ struct vegaNode* findVegaNodeWithKey(struct vegaNode* nodeInList, vegaKey sKey)
         }
 
         cNode = cNode->next;
-    } while (cNode->next != NULL);
+    } while (cNode != NULL);
 
     return NULL;
+}
+
+int getCountOfVegaNodes(struct vegaNode* nodeInList)
+{
+    struct vegaNode* cNode = getFirstVegaNodeInList(nodeInList);
+    int count = 0;
+
+    do
+    {
+        count++;
+
+        cNode = cNode->next;
+    } while (cNode != NULL);
+
+    return count;
 }
